@@ -1,0 +1,7 @@
+make: Entering directory 'd:/b._Repositori/13._golangprogate/rgolang-progate'
+echo Cleaning...
+echo y | DEL /S dist
+go clean
+echo Cleaned and deleted binaries
+make: Leaving directory 'd:/b._Repositori/13._golangprogate/rgolang-progate'
+ 

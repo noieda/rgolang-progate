@@ -1,0 +1,207 @@
+{{template "base" .}}
+
+    {{define "title"}}
+        Todo
+    {{end}}
+
+    {{define "content"}}
+
+        {{$todo := index .Data "todo"}}
+
+        <h2 class="mt-5">Todo {{$todo.ID}}</h2>
+        <div class="clearfix"></div>
+        <hr>
+
+        <form method="post" action="" name="user_form" id="user_form" class="needs-validation" autocomplete="off" novalidate="">
+
+        <div class="mb-3">
+            <label for="todo" class="form-label">Kegiatan</label>
+            <input type="text" class="form-control" id="todo" name="todo" required="" autocomplete="todo-new">
+        </div>
+
+        <div class="mb-3">
+            <label for="poc" class="form-label">Penanggung Jawab</label>
+            <input type="text" class="form-control" id="poc" name="poc" required="" autocomplete="poc-new">
+        </div>
+
+        <div class="mb-3">
+            <label for="deadline" class="form-label">Deadline</label>
+            <input type="text" class="form-control" id="deadline" name="deadline" autocomplete="deadline-new">
+        </div>
+
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <input type="text" class="form-control" id="status" name="status" autocomplete="status-new">
+        </div>
+
+        <hr>
+
+        <div class="float-start">
+            <a class="btn btn-primary" href="javascript:void(0);" id="saveBtn">Simpan</a>
+
+            <a class="btn btn-warning" href="/" id="cancelBtn">Kembali</a>
+        </div>
+        <div class="float-end">
+            <a class="btn btn-danger" href="javascript:void(0);" id="deleteBtn">Hapus</a>
+            
+        </div>
+
+    </form>
+
+    {{end}}
+
+    {{define "js"}}
+
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+
+            let id = window.location.pathname.split("/").pop();
+            console.log(id)
+            
+            document.addEventListener("DOMContentLoaded", function() {
+            
+                if (id !== "0") {
+
+                    const requestOptions = {
+                        method: 'post',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        }
+                    }
+
+                    fetch("{{.API}}/todo/" + id, requestOptions)
+                        .then(response => response.json())
+                        .then(function(data) {
+                            console.log(data)
+
+                            if (data) {
+                            
+                                document.getElementById("todo").value = data.todo
+                                document.getElementById("poc").value = data.poc
+                                document.getElementById("deadline").value = data.deadline
+                                document.getElementById("status").value = data.status
+
+                            }
+
+                        })
+                }
+
+            })
+
+            saveBtn.addEventListener("click", function() {
+
+                Swal.fire({
+                    title: 'Simpan Perubahan',
+                    text: "Anda menyimpan aktivitas ini",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Ubah',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: 'Batal'
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+
+                            let payload = {
+                                id: parseInt(id, 10),
+                                todo: document.getElementById("todo").value,
+                                poc: document.getElementById("poc").value,
+                                deadline: document.getElementById("deadline").value,
+                                status: document.getElementById("status").value,
+                                //todo: document.getElementById("todo").value,
+                            }
+                            
+                            const requestOptions = {
+                                method: 'post',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json', 
+                                },
+                                body: JSON.stringify(payload)
+                            }
+
+                            {{/* console.log("payload:\n")
+                            console.log(payload)
+                            console.log("requestOptions.body:\n")
+                            console.log(requestOptions.body) */}}
+
+                            fetch("{{.API}}/todo/update/" + id, requestOptions)
+                                .then(response => response.json())
+                                .then(function (data) {
+
+                                    {{/* console.log("data:\n")
+                                    console.log(data) */}}
+
+                                    if(data.error) {
+                                    
+                                        Swal.fire("Error: " + data.message)
+                                    
+                                    } else {
+                                    
+                                        Swal.fire(
+                                            'Diubah',
+                                            'Data aktivitas diubah',
+                                            'success'
+                                            )
+
+                                        location.href="/"
+                                    
+                                    }
+                                })
+                            
+                            
+                        }
+                    })
+            })
+
+            deleteBtn.addEventListener("click", function() {
+
+                Swal.fire({
+                    title: 'Konfirmasi Penghapusan',
+                    text: "Anda menghapus aktivitas ini",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Hapus',
+                    cancelButtonColor: '#3085d6', 
+                    cancelButtonText: 'Batal'
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+
+                            const requestOptions = {
+                                method: 'post',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                }
+                            }
+
+                            fetch("{{.API}}/todo/delete/" + id, requestOptions)
+                                .then(response => response.json())
+                                .then(function (data) { 
+
+                                    console.log(data)
+                                
+                                })
+
+                            Swal.fire(
+                            'Dihapus',
+                            'Data aktivitas dihapus',
+                            'success'
+                            )
+
+                            location.href="/"
+                        }
+                    })
+
+            })
+
+
+        </script>
+
+    {{end}}
+
+

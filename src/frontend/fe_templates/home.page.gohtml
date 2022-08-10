@@ -1,0 +1,96 @@
+{{template "base" . }}
+
+    {{define "title"}}
+        Todo Golang
+    {{end}}
+
+    {{define "content"}}
+        <h2 class="mt-5">Todo Golang</h2>
+        <div class="float-end">
+            <a class="btn btn-outline-secondary" href="/todo/0">Add Todo List</a>
+        </div>
+        <div class="clearfix"></div>
+        <hr>
+
+        <table id="todo-table" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Kegiatan</th>
+                    <th>Penanggung Jawab</th>
+                    <th>Deadlline</th>
+                    <th>Status</th>
+                    <th>Tindakan</th>
+                    {{/* <th>Dibuat</th>
+                    <th>Diperbaharui</th> */}}
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        
+    {{end}}
+
+    {{define "js"}}
+
+        <script>
+
+            document.addEventListener("DOMContentLoaded", function() {
+            
+                let tbody = document.getElementById("todo-table").getElementsByTagName("tbody")[0]
+                const requestOptions = {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    }
+                }
+
+                console.log('{{.API}}')
+
+                fetch("{{.API}}/", requestOptions)
+                    .then(response => response.json())
+                    .then(function(data) {
+                    
+                        console.log(data)
+                        if(data) {
+                            data.forEach(function(i) {
+                                
+                                let newRow = tbody.insertRow()
+                                let newCell = newRow.insertCell()
+                                
+                                let item = document.createTextNode(i.todo)
+                                newCell.appendChild(item)
+                                
+                                newCell = newRow.insertCell()
+                                item = document.createTextNode(i.poc)
+                                newCell.appendChild(item)
+
+                                newCell = newRow.insertCell()
+                                item = document.createTextNode(i.deadline)
+                                newCell.appendChild(item)
+
+                                newCell = newRow.insertCell()
+                                item = document.createTextNode(i.status)
+                                newCell.appendChild(item)
+
+                                newCell = newRow.insertCell()
+                                newCell.innerHTML = `<a href="/todo/${i.id}">Edit</a>`
+
+                            })
+                        
+                        } else {
+                        
+                        let newRow = tbody.insertRow()
+                        let newCell = newRow.insertCell()
+                        newCell.setAttribute("colspan", "5")
+                        newCell.innerHTML = "No data available"
+                    }
+
+
+                    })
+            })
+
+        </script>
+
+    {{end}}
