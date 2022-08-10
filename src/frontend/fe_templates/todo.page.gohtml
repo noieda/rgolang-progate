@@ -178,22 +178,31 @@
                                     'Content-Type': 'application/json',
                                 }
                             }
-
+                                    
                             fetch("{{.API}}/todo/delete/" + id, requestOptions)
                                 .then(response => response.json())
                                 .then(function (data) { 
 
-                                    console.log(data)
+                                    if (data.error) {
+
+                                        Swal.fire("Error: " + data.message)
+                                    
+                                    } else {
+
+                                        Swal.fire(
+                                            'Dihapus',
+                                            'Data aktivitas dihapus',
+                                            'success'
+                                            )
+
+                                        location.href="/"
+                                    
+                                    }
+
                                 
                                 })
 
-                            Swal.fire(
-                            'Dihapus',
-                            'Data aktivitas dihapus',
-                            'success'
-                            )
-
-                            location.href="/"
+                            
                         }
                     })
 
